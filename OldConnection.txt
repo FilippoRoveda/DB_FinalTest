@@ -1,0 +1,25 @@
+$connection_String = "mysql:host=$host;dbname=$dbname;user=$user;password=$password";
+
+    
+    
+    try
+    {
+        $connection_Object = new PDO($connection_String);
+        $connection_Object->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+    catch(PDOException $e)
+    {
+        $exceptionMessage =  $e->getMessage();
+        $errorMessage = "ERROR: Connection to database failed!";
+        
+        echo nl2br ("$exceptionMessage \n $errorMessage");
+    }
+
+
+    $connection_Object = new mysqli($host, $user, $password, $dbname);
+    
+    if (mysqli_connect_errno()) 
+    {
+        echo "Failed to connect to MySQL: " . $connection_Object -> connect_error;
+        exit();
+    }
