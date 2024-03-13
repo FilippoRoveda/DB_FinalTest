@@ -16,7 +16,7 @@ public class Logout_Controller : MonoBehaviour
 
     private void OnLogoutButtonPressed()
     {
-        DB_Interaction_System.Instance.TryPlayerLogout(loggedUsername.text);
+        StartCoroutine(DB_Interaction_System.Instance.TryPlayerLogout(loggedUsername.text));
     }
     public void SetLoggedUsername(string username)
     {

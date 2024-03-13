@@ -2,18 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 [System.Serializable]
 public struct DisplayedUser
 {
-    public string ID;
-    public string Username;
-}
-
-[System.Serializable]
-public struct TableWrapper<T>
-{
-    public T[] results;
+    public string ID { get; set; }
+    public string Username { get; set; }
 }
 
 
@@ -53,15 +48,15 @@ public class RegistrationList : MonoBehaviour
         yield return request.SendWebRequest();
 
         
-        //List<DisplayedUser> res = JsonConvert.DeserializeObject<List<DisplayedUser>>(request.downloadHandler.text);
+        List<DisplayedUser> res = JsonConvert.DeserializeObject<List<DisplayedUser>>(request.downloadHandler.text);
 
-        //foreach (var r in res)
-        //{
-        //    var obj = Instantiate(userPrefab, list.transform);
-        //    var comp = obj.GetComponent<RegisteredUserPrefab>();
-        //    comp.id.text = r.ID;
-        //    comp.username.text = r.Username;
-        //}
+        foreach (var r in res)
+        {
+            var obj = Instantiate(userPrefab, list.transform);
+            var comp = obj.GetComponent<RegisteredUserPrefab>();
+            comp.id.text = r.ID;
+            comp.username.text = r.Username;
+        }
     }
 
 }

@@ -130,25 +130,34 @@ public class DB_Interaction_System : MonoBehaviour
         UI_System.Instance.EnableInput();
     }
 
-    public void TryPlayerLogout(string username)
+    public IEnumerator TryPlayerLogout(string username)
     {
         UI_System.Instance.BlockInput();
 
         BlockTimer();
         int intSessionLenght = (int)sessionLenght;
-        UnityWebRequest request = UnityWebRequest.Get(logout_URL + $"Username={username}" + $"&SessionLenght={intSessionLenght}");
-        request.SendWebRequest();
-        
-        if (request.error != null)
+
+        WWWForm data = new WWWForm();
+        data.AddField("Username", username);
+        data.AddField("SessionLenght", intSessionLenght);
+        UnityWebRequest request = UnityWebRequest.Post(logout_URL, data);
+
+        yield return request.SendWebRequest();
+
+        if (request.error != null || request.downloadHandler.text.Contains("ERROR"))
         {
-            Debug.Log("Logout ERROR: " + request.error);
+            Debug.LogError("ERROR: " + request.downloadHandler.text);
+            logPanel.SendLog("ERROR: " + request.downloadHandler.text);
         }
+
         else
         {
-            Debug.Log($"Logout for user {username} was succesfull!");
+            Debug.Log(request.downloadHandler.text);
+
             loginController.EnableFields();
             logoutController.DisableLogoutButton();
             logoutController.SetLoggedUsername("None");
+
             ResetTimer();
         }
 
