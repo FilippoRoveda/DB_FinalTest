@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 
+
 [System.Serializable]
 public struct DisplayedUser
 {
@@ -11,7 +12,9 @@ public struct DisplayedUser
     public string Username { get; set; }
 }
 
-
+/// <summary>
+/// UI class that contain and handle the list of registered users.
+/// </summary>
 public class RegistrationList : MonoBehaviour
 {
     [SerializeField] private GameObject userPrefab;
@@ -20,29 +23,35 @@ public class RegistrationList : MonoBehaviour
     private string url = "https://dbtest01eh.000webhostapp.com/GP3/05_GetRegisteredUsers.php";
 
 
+    #region Unity callbacks
     private void Awake()
     {
-        RefreshRegusteredUserList();
+        RefreshRegisteredUserList();
     }
     private void OnEnable()
     {
-        DB_Interaction_System.RegisteredUserUpdate.AddListener(RefreshRegusteredUserList);
+        DB_Interaction_System.RegisteredUserUpdate.AddListener(RefreshRegisteredUserList);
     }
     private void OnDisable()
     {
-        DB_Interaction_System.RegisteredUserUpdate.RemoveListener(RefreshRegusteredUserList);
+        DB_Interaction_System.RegisteredUserUpdate.RemoveListener(RefreshRegisteredUserList);
     }
+    #endregion
 
-    public void RefreshRegusteredUserList()
+    public void RefreshRegisteredUserList()
     {
         for(int i = 0; i < list.transform.childCount; i++) 
         {
             Destroy(list.transform.GetChild(i).gameObject);
         }
-        StartCoroutine(RequestCoroutine());
+        StartCoroutine(RequestRegisteredUserCoroutine());
     }
 
-    public IEnumerator RequestCoroutine()
+    /// <summary>
+    /// Coroutine that send a web request to obtain every registered user.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator RequestRegisteredUserCoroutine()
     {
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();

@@ -1,6 +1,9 @@
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Container class for a run slot element in ranking.
+/// </summary>
 public class RunSlot : MonoBehaviour
 {
     [SerializeField] public TMP_Text position;

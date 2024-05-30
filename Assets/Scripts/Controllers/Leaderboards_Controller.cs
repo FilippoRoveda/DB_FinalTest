@@ -7,6 +7,9 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 
+/// <summary>
+/// Utility class that contain run data from Json objects.
+/// </summary>
 [System.Serializable]
 public struct Run
 {
@@ -17,7 +20,9 @@ public struct Run
     public string Score { get; set; }
 }
 
-
+/// <summary>
+/// Controller for the leaderboards ui interface.
+/// </summary>
 public class Leaderboards_Controller : MonoBehaviour
 {
     public static Leaderboards_Controller instance;
@@ -36,8 +41,9 @@ public class Leaderboards_Controller : MonoBehaviour
     [SerializeField] private Button insertRun_Button;
     [SerializeField] private LogPanel logPanel;
 
-    [SerializeField] private List<PassIntButton> selectLevelButtons;
+    [SerializeField] private List<GetIntButton> selectLevelButtons;
 
+    #region Unity callbacks
     private void Awake()
     {
         instance = this;
@@ -54,12 +60,60 @@ public class Leaderboards_Controller : MonoBehaviour
 
     private void Start()
     {
-        SelectRunRank(0);
+        OnRunRakSelection(0);
     }
+    #endregion
+
+    #region Callbacks
     public void OnInsertRunButtonPressed()
     {
         StartCoroutine(InsertRunRoutine());
     }
+
+    public void OnRunRakSelection(int runRank)
+    {
+        DestroyRunPrefabs();
+        StartCoroutine(SelectRunRoutine(runRank));
+    }
+    #endregion
+
+    #region Utilities
+    public void ResetFields()
+    {
+        username_Input.text = "None...";
+        level_Input.text = "None...";
+        playTime_Input.text = "None...";
+        score_Input.text = "None...";
+    }
+    private void DestroyRunPrefabs()
+    {
+        for (int i = 0; i < rankedList.transform.childCount; i++)
+        {
+            Destroy(rankedList.transform.GetChild(i).gameObject);
+        }
+    }
+
+    //Make possible to choice ascendent or descendent
+    //Pass a predicate in which insert the 2 elements of the array
+    void ScoreBubbleSort(ref List<Run> array)
+    {
+        int size = array.Count;
+
+        for (int step = 0; step < size; ++step)
+        {
+            for (int i = 0; i < size - step - 1; ++i)
+            {
+                if (int.Parse(array[i].Score) < int.Parse(array[i + 1].Score))
+                {
+                    Run temp = array[i];
+                    array[i] = array[i + 1];
+                    array[i + 1] = temp;
+                }
+            }
+        }
+    }
+    #endregion
+
 
     public IEnumerator InsertRunRoutine()
     {
@@ -88,24 +142,8 @@ public class Leaderboards_Controller : MonoBehaviour
 
         ResetFields();
     }
-    public void ResetFields()
-    {
-        username_Input.text = "None...";
-        level_Input.text = "None...";
-        playTime_Input.text = "None...";
-        score_Input.text = "None...";
-    }
 
 
-
-    public void SelectRunRank(int j)
-    {
-        for (int i = 0; i < rankedList.transform.childCount; i++)
-        {
-            Destroy(rankedList.transform.GetChild(i).gameObject);
-        }
-        StartCoroutine(SelectRunRoutine(j));
-    }
     private IEnumerator SelectRunRoutine(int i)
     {
         UI_System.Instance.BlockInput();
@@ -125,7 +163,7 @@ public class Leaderboards_Controller : MonoBehaviour
         {
             Debug.LogWarning(request.downloadHandler.text);
             List<Run> res = JsonConvert.DeserializeObject<List<Run>>(request.downloadHandler.text);
-            bubbleSort(ref res);
+            ScoreBubbleSort(ref res);
             int c = 1;
             foreach (var r in res)
             {
@@ -141,23 +179,5 @@ public class Leaderboards_Controller : MonoBehaviour
             }
         }
         UI_System.Instance.EnableInput();
-    }
-
-    void bubbleSort(ref List<Run> array)
-    {
-        int size = array.Count;
-
-        for (int step = 0; step < size; ++step)
-        {
-            for (int i = 0; i < size - step-1; ++i)
-            {
-                if (int.Parse(array[i].Score) < int.Parse(array[i + 1].Score))
-                {
-                    Run temp = array[i];
-                    array[i] = array[i + 1];
-                    array[i + 1] = temp;
-                }
-            }
-        }
     }
 }

@@ -2,6 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Conrtoller that handle the regiatration screen UIs.
+/// </summary>
 public class Registration_Controller : MonoBehaviour
 {
     [SerializeField] private Button registrationButton;

@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PassIntButton : MonoBehaviour
+/// <summary>
+/// Custom wrapper class that send an integer.
+/// </summary>
+public class GetIntButton : MonoBehaviour
 {
     private Button button;
     [SerializeField] private int selectionNum;
@@ -14,6 +17,6 @@ public class PassIntButton : MonoBehaviour
 
     private void OnButtonPressed()
     {
-        Leaderboards_Controller.instance.SelectRunRank(selectionNum);
+        Leaderboards_Controller.instance.OnRunRakSelection(selectionNum);
     }
 }

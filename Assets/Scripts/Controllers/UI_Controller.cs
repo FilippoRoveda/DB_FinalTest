@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Main UI controller that handle display and hide of main user interface screens.
+/// </summary>
 public class UI_Controller : MonoBehaviour
 {
     [SerializeField] private UI_Interface registration_Screen;

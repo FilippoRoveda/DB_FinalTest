@@ -9,11 +9,16 @@ public class UI_System : MonoBehaviour
     [SerializeField] Button[] buttons;
     [SerializeField] TMP_InputField[] inputFields;
 
+    #region Unity callbacks
     private void Awake()
     {
         Instance = this;
     }
+    #endregion
 
+    /// <summary>
+    /// Block interaction with every interactable element in the user interface.
+    /// </summary>
     public void BlockInput()
     {
         foreach (var button in buttons) 
@@ -25,6 +30,9 @@ public class UI_System : MonoBehaviour
             field.interactable = false;
         }
     }
+    /// <summary>
+    /// Enable interaction with every interactable element in the user interface.
+    /// </summary>
     public void EnableInput()
     {
         foreach (var button in buttons)
