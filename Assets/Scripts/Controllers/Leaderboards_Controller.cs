@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
 /// <summary>
 /// Utility class that contain run data from Json objects.
 /// </summary>
@@ -137,10 +136,13 @@ public class Leaderboards_Controller : MonoBehaviour
         {
             Debug.Log(request.downloadHandler.text);
             logPanel.SendLog(request.downloadHandler.text);
-        }
-        UI_System.Instance.EnableInput();
 
-        ResetFields();
+            ResetFields();
+            DestroyRunPrefabs();
+            yield return StartCoroutine(SelectRunRoutine(0));
+        }
+
+        UI_System.Instance.EnableInput();  
     }
 
 

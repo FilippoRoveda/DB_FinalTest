@@ -23,11 +23,14 @@ public class DB_Interaction_System : MonoBehaviour
     private string registration_URL = "https://dbtest01eh.000webhostapp.com/GP3/02_Player_Registration.php?";
     private string login_URL = "https://dbtest01eh.000webhostapp.com/GP3/03_Player_Login.php?";
     private string logout_URL = "https://dbtest01eh.000webhostapp.com/GP3/04_Player_Logout.php?";
+    private string registeredUsersReset_URL = "https://dbtest01eh.000webhostapp.com/GP3/09_ClearRegisteredUsers.php";
 
     private bool isLogged = false;
+    private string loggedUserName = string.Empty;
     private float sessionLenght = 0.0f;
 
     public static UnityEvent RegisteredUserUpdate = new UnityEvent();
+    public static UnityEvent RankedRunsUpdate = new UnityEvent();
 
     #region Unity callbacks
     private void Awake()
@@ -39,12 +42,6 @@ public class DB_Interaction_System : MonoBehaviour
     {
         StartCoroutine(Try_DBConnection());
     }
-
-    private void OnDisable()
-    {
-        StartCoroutine(Try_DBConnectionClosing());
-    }
-
 
     private void Update()
     {
@@ -150,10 +147,11 @@ public class DB_Interaction_System : MonoBehaviour
             logPanel.SendLog(request.downloadHandler.text);
 
             logoutController.EnableLogoutButton();
+            loginController.DisableFields();
             logoutController.SetLoggedUsername( username );
-            loginController.ResetFields();
 
             ActivateTimer();
+            loggedUserName = username;
         }
 
         UI_System.Instance.EnableInput();
@@ -186,12 +184,14 @@ public class DB_Interaction_System : MonoBehaviour
         else
         {
             Debug.Log(request.downloadHandler.text);
+            logPanel.SendLog(request.downloadHandler.text);
 
             loginController.EnableFields();
             logoutController.DisableLogoutButton();
             logoutController.SetLoggedUsername("None");
 
             ResetTimer();
+            loggedUserName = string.Empty;
         }
 
         loginController.ResetFields();
@@ -201,7 +201,7 @@ public class DB_Interaction_System : MonoBehaviour
     /// Try to close the database connection.
     /// </summary>
     /// <returns></returns>
-    private IEnumerator Try_DBConnectionClosing()
+    public IEnumerator Try_DBConnectionClosing()
     {
         UI_System.Instance.BlockInput();
 
@@ -219,6 +219,43 @@ public class DB_Interaction_System : MonoBehaviour
             Debug.LogError(request.downloadHandler.text);
             logPanel.SendLog(request.downloadHandler.text);
         }
+    }
+
+
+    public IEnumerator Try_RegisteredUserReset() 
+    {
+        UI_System.Instance.BlockInput();
+
+        WWWForm data = new WWWForm();
+        data.AddField("Username", loggedUserName);
+
+        UnityWebRequest request = UnityWebRequest.Post(registeredUsersReset_URL, data);
+        yield return request.SendWebRequest();
+
+        if (request.error != null)
+        {
+            Debug.LogError("Request ERROR: " + request.error);
+            logPanel.SendLog("Request ERROR: " + request.error);
+        }
+
+        if (request.downloadHandler.text.Contains("ERROR"))
+        {
+            Debug.LogError(request.downloadHandler.text);
+            logPanel.SendLog(request.downloadHandler.text);
+        }
+        else
+        {
+            Debug.Log(request.downloadHandler.text);
+            logPanel.SendLog(request.downloadHandler.text);
+        }
+
+        RegisteredUserUpdate?.Invoke();
+        UI_System.Instance.EnableInput();
+    }
+    public IEnumerator Try_RankedRunReset() 
+    { 
+        yield return null;
+        RankedRunsUpdate?.Invoke();
     }
     #endregion
 
